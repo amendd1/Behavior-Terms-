@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Behavior Terminology Mastery Activity</title>
+<style>
+:root{--bg:#f3f6f8;--card:#fff;--ink:#14263a;--muted:#5a6b7b;--line:#cfd9e2;--accent:#1d4e7a;--ok:#1e7a4c;--okbg:#e4f4ea;--bad:#a63a2b;--badbg:#fbe9e6}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1b27;--card:#16273a;--ink:#e6eef5;--muted:#9fb1c2;--line:#2d4359;--accent:#7fb5e6;--ok:#6fd39c;--okbg:#153a2a;--bad:#f09a8c;--badbg:#3f1f1a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.7rem;line-height:1.2;margin:0 0 8px}
+p{margin:0 0 14px;max-width:62ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:22px}
+.muted{color:var(--muted);font-size:.95rem}
+button,input{font:inherit}
+input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);margin:6px 0 16px}
+.btn{background:var(--accent);color:var(--bg);border:0;border-radius:4px;padding:10px 20px;cursor:pointer;font-weight:bold}
+.btn.alt{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:0 0 6px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.def{font-size:1.2rem;margin:18px 0}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:12px 14px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:bold}
+.opt.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.fb{min-height:26px;margin:14px 0 8px;font-weight:bold}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+ul{padding-left:20px}li{margin-bottom:8px}
+.rec{background:var(--bg);border:1px dashed var(--accent);border-radius:4px;padding:14px;font:15px/1.6 ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:14px 0}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Behavior Terminology Mastery</h1>
+
+<section id="start" class="card">
+  <p>Match each description to the correct term. Each round covers every item. To finish, you must answer every item correctly in a single round. Any miss sends you into a new round.</p>
+  <p class="muted">When you reach 100%, you will get a completion record. Copy it into the Canvas assignment.</p>
+  <label for="nm">Your full name</label>
+  <input id="nm" autocomplete="name">
+  <button class="btn" id="go">Start round 1</button>
+</section>
+
+<section id="play" class="card hide">
+  <div class="muted" id="meta"></div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="def" id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div class="fb" id="fb" aria-live="polite"></div>
+  <button class="btn hide" id="next">Next</button>
+</section>
+
+<section id="miss" class="card hide">
+  <h2 id="mh" style="margin-top:0"></h2>
+  <p>Review what you missed, then start a new round. All items come back.</p>
+  <ul id="ml"></ul>
+  <button class="btn" id="again">Start next round</button>
+</section>
+
+<section id="done" class="card hide">
+  <h2 style="margin-top:0">100% reached</h2>
+  <p>Copy the record below and paste it into the Canvas assignment.</p>
+  <div class="rec" id="rec"></div>
+  <button class="btn" id="copy">Copy record</button>
+  <span class="muted" id="cp"></span>
+</section>
+</main>
+
+<script>
+const ITEMS=[
+["Removing a reinforcer after a behavior to decrease that behavior.","Response Cost"],
+["Temporarily removing access to reinforcement following a behavior.","Timeout"],
+["An environmental event, object, or condition that can affect behavior.","Stimulus / Stimuli"],
+["Reinforcing a desired behavior while withholding reinforcement for another behavior.","Differential Reinforcement"],
+["Providing extra help or cues to help a person perform a behavior correctly.","Prompting"],
+["Reinforcing small steps toward a desired behavior.","Shaping"],
+["Teaching a sequence of behaviors by linking individual steps together.","Chaining"],
+["Breaking a complex skill into smaller steps.","Task Analysis"],
+["Teaching in a way that minimizes opportunities for errors by providing prompts before mistakes occur.","Errorless Learning"],
+["Using an extra cue or assistance to help someone make the correct response.","Response Prompting"],
+["Something that happens immediately before a behavior.","Antecedent"],
+["An observable and measurable action.","Behavior"],
+["How many times a behavior occurs within a specific period of time.","Frequency"],
+["How long a behavior lasts, from the moment it starts to the moment it ends.","Duration"],
+["The amount of time between an antecedent (such as a prompt or instruction) and the start of the behavior.","Latency"],
+["Something that happens immediately after a behavior and affects whether it happens again.","Consequence"],
+["Adding something after a behavior to make the behavior more likely to occur again.","Positive Reinforcement"],
+["Removing something after a behavior to make the behavior more likely to occur again.","Negative Reinforcement"],
+["A consequence that makes a behavior less likely to occur again.","Punishment"],
+["Something is added and the behavior increases.","Positive Reinforcement"],
+["Something is added and the behavior decreases.","Positive Punishment"],
+["Something is removed and the behavior increases.","Negative Reinforcement"],
+["Something is removed and the behavior decreases.","Negative Punishment"]
+];
+const GRID=["Positive Reinforcement","Positive Punishment","Negative Reinforcement","Negative Punishment"];
+const ALL=[...new Set(ITEMS.map(i=>i[1]).concat(GRID))];
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let name="",round=0,order=[],idx=0,missed=[],history=[];
+
+function show(id){["start","play","miss","done"].forEach(s=>$(s).classList.toggle("hide",s!==id))}
+
+function choices(item){
+  const isGrid=item[0].startsWith("Something is");
+  const pool=isGrid?GRID:ALL.filter(t=>t!==item[1]);
+  const wrong=isGrid?GRID.filter(t=>t!==item[1]):shuffle(pool).slice(0,3);
+  return shuffle([item[1],...wrong]);
+}
+
+function startRound(){
+  round++;order=shuffle(ITEMS);idx=0;missed=[];show("play");render();
+}
+
+function render(){
+  const item=order[idx];
+  $("meta").textContent="Round "+round+" \u2022 Item "+(idx+1)+" of "+order.length;
+  $("prog").style.width=(idx/order.length*100)+"%";
+  $("q").textContent=item[0];
+  $("fb").textContent="";$("fb").className="fb";
+  $("next").classList.add("hide");
+  const box=$("opts");box.innerHTML="";
+  choices(item).forEach(t=>{
+    const b=document.createElement("button");
+    b.className="opt";b.textContent=t;
+    b.onclick=()=>answer(b,t,item);
+    box.appendChild(b);
+  });
+}
+
+function answer(btn,t,item){
+  const ok=t===item[1];
+  document.querySelectorAll(".opt").forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===item[1])b.classList.add("right");
+  });
+  if(!ok){btn.classList.add("wrong");missed.push(item)}
+  $("fb").textContent=ok?"Correct.":"Not quite. The answer is "+item[1]+".";
+  $("fb").className="fb "+(ok?"ok":"bad");
+  $("next").textContent=idx===order.length-1?"Finish round":"Next";
+  $("next").classList.remove("hide");$("next").focus();
+}
+
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase().padStart(7,"0")}
+
+function endRound(){
+  const score=order.length-missed.length;
+  history.push(score+"/"+order.length);
+  if(!missed.length){finish();return}
+  $("mh").textContent="Round "+round+": "+score+" of "+order.length+" correct";
+  const ul=$("ml");ul.innerHTML="";
+  missed.forEach(m=>{const li=document.createElement("li");li.textContent=m[0]+" \u2192 "+m[1];ul.appendChild(li)});
+  show("miss");
+}
+
+function finish(){
+  const d=new Date();
+  const stamp=d.toLocaleString();
+  const code=hash(name.toLowerCase()+"|"+d.toISOString().slice(0,10)+"|"+round+"|AAMP-BT");
+  $("rec").textContent=
+    "Name: "+name+"\nActivity: Behavior Terminology Mastery\nCompleted: "+stamp+
+    "\nRounds needed: "+round+"\nRound scores: "+history.join(", ")+
+    "\nCompletion code: "+code;
+  show("done");
+}
+
+$("go").onclick=()=>{
+  name=$("nm").value.trim();
+  if(!name){$("nm").focus();$("nm").placeholder="Enter your name to begin";return}
+  startRound();
+};
+$("next").onclick=()=>{idx++;idx<order.length?render():endRound()};
+$("again").onclick=startRound;
+$("copy").onclick=()=>{
+  const t=$("rec").textContent;
+  const ok=()=>{$("cp").textContent=" Copied."};
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>{$("cp").textContent=" Select the text and copy it manually."});
+  else $("cp").textContent=" Select the text and copy it manually.";
+};
+</script>
+</body>
+</html>
